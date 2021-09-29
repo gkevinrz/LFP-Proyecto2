@@ -6,7 +6,7 @@ class Application():
         self.root = Tk()
         self.root.title('SolutionPy')     
         self.root.iconbitmap('Image/Chart.ico')
-        self.root.config(bg='#e5e7e9')
+        self.root.config(bg='#d0d3d4')
         self.root.state('zoomed')
 
     def create_widgets(self):
@@ -17,11 +17,22 @@ class Application():
         s.configure('TNotebook.Tab', font=('Segoe UI', 12,'bold'),background='#3498db', foreground='white', borderwidth=0)
         s.map('TNotebook.Tab', background=[('selected', '#2471a3'),('active', "#3498db")], foreground=[("selected", 'white')])
         
-        labelframe = LabelFrame(self.root, text="Opciones",bg = "#2c3e50",bd=3,labelanchor='n',fg='white')
-        
+        labelframe = LabelFrame(self.root, text="Opciones",bg = "#000000",bd=1,labelanchor='n',fg='white')
+        labelframe.pack(ipadx=50,ipady=50)
         labelframe.config(font=('Segoe UI', 20,'bold'))
-        labelframe.place(x=40, y=20,width=400,height=90)
+        labelframe.place(x=500, y=20,width=600,height=100)
+        ##
+        self.ButtonAbrirArchivo=Button(labelframe,text='Abrir Archivo',font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
+        self.ButtonAbrirArchivo.place(x=150, y=10,width=100,height=30)
+
+        self.ButtonCargarArchivo=Button(labelframe,text ="Analizar Archivo",font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
+        self.ButtonCargarArchivo.place(x=300, y=10,width=150,height=30)
         
+
+
+
+
+        ##
         text2 = Text(self.root, height=20, width=50)
         scroll = Scrollbar(self.root, command=text2.yview)
         text2.configure(yscrollcommand=scroll.set)
@@ -48,32 +59,15 @@ class Application():
         scroll.place(x=823,y=150,height=500)
         
         
-        
-        
-        
-        #s.theme_use("default")
-        
     
-        #Menu.styl
-        #Menu.config(width=2000,height=1000)
-        #Ventana_Cargar=CargarArchivo(Menu)
-        #Ventana_Analizar=AnalizarArchivo(Menu)
-        #Ventana_Reportes=VerReportes(Menu)
-        #Ventana_VerImagen=VerImagen(Menu)
-        #Menu.add(Ventana_Cargar.FrameCargar,text='Cargar Archivo',padding=10)
-        #Menu.add(Ventana_Analizar.FrameAnalizar,text="Analizar Archivo", padding=10)
-        #Menu.add(Ventana_VerImagen.FrameVerImagen,text="Ver Imagen", padding=10)
-        #Menu.add(Ventana_Reportes.FrameReportes,text="Ver Reportes", padding=10)
-
         
-        #fill='both', expand=True
-        #Menu.pack(ipadx=10,ipady=10,expand=True)
         
 
 
     def say_hi(self):
         pass
-        #os.system('dot -Tpng imagen.html -o NuevaImagen.png')
+        #
+        #
 
 
 Aps=Application()
