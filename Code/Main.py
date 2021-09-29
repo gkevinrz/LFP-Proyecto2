@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 
 class Application():
     def __init__(self):
@@ -18,24 +20,22 @@ class Application():
         #labelframe.pack(expand=True,fill=X,pady=100)
         labelframe.place(x=40,y=20,width=1260,height=100)
         ##
-        self.ButtonAbrirArchivo=Button(labelframe,text='Cargar Archivo',font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
+        self.ButtonAbrirArchivo=Button(labelframe,text='Cargar Archivo',font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black',command=self.select_file)
         self.ButtonAbrirArchivo.place(x=400, y=10,width=150,height=30)
 
-        self.ButtonCargarArchivo=Button(labelframe,text ="Analizar Archivo",font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
-        self.ButtonCargarArchivo.place(x=600, y=10,width=150,height=30)
+        self.ButtonAnalizarArchivo=Button(labelframe,text ="Analizar Archivo",font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
+        self.ButtonAnalizarArchivo.place(x=600, y=10,width=150,height=30)
         
         self.combo=ttk.Combobox(labelframe,state="readonly")
-        self.combo.place(x=800, y=10,width=150,height=30)
-
-
+        self.combo.place(x=800, y=10,width=230,height=30)
+        self.combo.config(font=('Segoe UI', 12,))
+        self.combo['values']=['Generar Reporte de Errores','Generar Reporte de Tokens','Generar Árbol de derivación']
+        
         ##
-        self.text2 = Text(self.root, height=20, width=50)
-        scroll = Scrollbar(self.root, command=self.text2.yview)
-        self.text2.configure(yscrollcommand=scroll.set,bg='#fdfefe',foreground='black',font=('Segoe UI', 12,))
-        #self.text2.tag_configure('bold_italics', font=('Arial', 12, 'bold', 'italic'))
-       
-        #self.text2.insert(END, quote)
-        self.text2.place(x=40, y=150,width=800,height=540)
+        self.TextoEntrada = Text(self.root, height=20, width=50)
+        scroll = Scrollbar(self.root, command=self.TextoEntrada.yview)
+        self.TextoEntrada.configure(yscrollcommand=scroll.set,bg='#fdfefe',foreground='black',font=('Segoe UI', 12,))
+        self.TextoEntrada.place(x=40, y=150,width=800,height=540)
         ##
         self.TextConsola=Text (self.root, height=20, width=50)   
         scrollConsola=Scrollbar(self.root,command=self.TextConsola.yview)
@@ -48,16 +48,47 @@ class Application():
         scroll.pack(expand=True,padx=10, fill=Y)
         scroll.place(x=823,y=150,height=540)
         
+
+    def select_file(self):
+        filetypes = (('Archivos lfp', '*.lfp'),('Todos los archivos', '*.*'))
+        archivo = filedialog.askopenfile(title='Abrir un archivo',initialdir='./',filetypes=filetypes)
+        if archivo is None:
+            messagebox.showerror(title='Error', message='No se eligió ningún archivo')
+            return None
+        else:
+            texto = archivo.read()
+            archivo.close()
+            messagebox.showinfo(title='Información', message='Archivo cargado exitosamente')
+            self.TextoEntrada.insert(END,texto)
+
+
+
+    def Lectura(self):
+        if self.TextoEntrada is not None:
+            #print(textoanalizar)
+            self.TextoEntrada+= "~"
+            messagebox.showinfo(title='Información', message='Lectura exitosa')
+            self.Analizar(self.TextoEntrada)
+            #print(self.TextoEntrada)
+        else:
+            messagebox.showerror(title='Error', message='No se pudo analizar la entrada, intenta de nuevo')
+        
         
     
-        
-        
 
-
-    def say_hi(self):
+    def Generar_TablaTokens(self):
         pass
         #
         #
+    def Generar_TablaErrores(self):
+        pass
+
+    def Generar_Arbol(self):
+        pass
+
+
+
+
 
 
 Aps=Application()
