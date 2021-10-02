@@ -47,7 +47,7 @@ class Application():
         ##
         scroll.pack(expand=True,padx=10, fill=Y)
         scroll.place(x=823,y=150,height=540)
-        
+
 
     def select_file(self):
         filetypes = (('Archivos lfp', '*.lfp'),('Todos los archivos', '*.*'))
