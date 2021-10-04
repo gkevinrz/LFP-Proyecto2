@@ -10,6 +10,7 @@ class Application():
         self.root.iconbitmap('Image/Chart.ico')
         self.root.config(bg='#f0f3f4')
         self.root.state('zoomed')
+        self.text=''
 
     def create_widgets(self):
         #Menu=ttk.Notebook(self.root)
@@ -23,7 +24,7 @@ class Application():
         self.ButtonAbrirArchivo=Button(labelframe,text='Cargar Archivo',font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black',command=self.select_file)
         self.ButtonAbrirArchivo.place(x=400, y=10,width=150,height=30)
 
-        self.ButtonAnalizarArchivo=Button(labelframe,text ="Analizar Archivo",font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black')
+        self.ButtonAnalizarArchivo=Button(labelframe,text ="Analizar Archivo",font=('Segoe UI', 12),bd=0,pady=10,padx=10,bg='#f7f9f9',fg='black',command=self.Lectura)
         self.ButtonAnalizarArchivo.place(x=600, y=10,width=150,height=30)
         
         self.combo=ttk.Combobox(labelframe,state="readonly")
@@ -56,26 +57,41 @@ class Application():
             messagebox.showerror(title='Error', message='No se eligió ningún archivo')
             return None
         else:
-            texto = archivo.read()
+            self.text = archivo.read()
             archivo.close()
             messagebox.showinfo(title='Información', message='Archivo cargado exitosamente')
-            self.TextoEntrada.insert(END,texto)
+            self.TextoEntrada.insert(INSERT,self.text)
 
 
 
     def Lectura(self):
-        if self.TextoEntrada is not None:
-            #print(textoanalizar)
-            self.TextoEntrada+= "~"
-            messagebox.showinfo(title='Información', message='Lectura exitosa')
-            self.Analizar(self.TextoEntrada)
-            #print(self.TextoEntrada)
-        else:
+        TextoAnalisis=self.TextoEntrada.get('1.0','end-1c')
+        if TextoAnalisis.isspace() or self.TextoEntrada.get('1.0','end-1c')=='':
             messagebox.showerror(title='Error', message='No se pudo analizar la entrada, intenta de nuevo')
+        else:
+            messagebox.showinfo(title='Información', message='Lectura exitosa')
+            TextoAnalizar=self.TextoEntrada.get('1.0','end-1c')
+            print(TextoAnalizar)
+            self.AnalisisLexico(TextoAnalizar)
+            TextoAnalizar=''
+
+
+
+        #TextoAnalizar=self.TextoEntrada.get('1.0','end-1c')
+        #if TextoAnalizar is not None:
+        #    print(TextoAnalizar)
+            #self.TextoEntrada+= "~"
+        #    messagebox.showinfo(title='Información', message='Lectura exitosa')
+            #self.Analizar(self.TextoEntrada)
+            #print(self.TextoEntrada)
+        #elif TextoAnalizar=='':
+        #    messagebox.showerror(title='Error', message='No se pudo analizar la entrada, intenta de nuevo')
         
         
     
-
+    def AnalisisLexico(self,Texto):
+        
+        pass
     def Generar_TablaTokens(self):
         pass
         #
