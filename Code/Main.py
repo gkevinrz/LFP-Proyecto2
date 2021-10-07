@@ -1,7 +1,10 @@
+from os import lseek
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
+from Error import Error
+from Token import Token
 
 class Application():
     def __init__(self):
@@ -11,6 +14,10 @@ class Application():
         self.root.config(bg='#f0f3f4')
         self.root.state('zoomed')
         self.text=''
+        self.ListaErrores1=[]
+        self.ListaTokens1=[]
+        self.ListaErrores=[]
+        self.ListaTokens=[]
 
     def create_widgets(self):
         #Menu=ttk.Notebook(self.root)
@@ -48,7 +55,7 @@ class Application():
         ##
         scroll.pack(expand=True,padx=10, fill=Y)
         scroll.place(x=823,y=150,height=540)
-
+        self.combo.bind('<<ComboboxSelected>>', self.AccionComboBox)
 
     def select_file(self):
         filetypes = (('Archivos lfp', '*.lfp'),('Todos los archivos', '*.*'))
@@ -71,7 +78,7 @@ class Application():
         else:
             messagebox.showinfo(title='Información', message='Lectura exitosa')
             TextoAnalizar=self.TextoEntrada.get('1.0','end-1c')
-            print(TextoAnalizar)
+            #print(TextoAnalizar)
             self.AnalisisLexico(TextoAnalizar)
             TextoAnalizar=''
 
@@ -87,17 +94,237 @@ class Application():
         #elif TextoAnalizar=='':
         #    messagebox.showerror(title='Error', message='No se pudo analizar la entrada, intenta de nuevo')
         
-        
     
+
+    def isLetra(self,caracter):
+        if((ord(caracter) >= 65 and ord(caracter) <= 90) or (ord(caracter) >= 97 and ord(caracter) <= 122) or ord(caracter) == 164 or ord(caracter) == 165):
+            return True
+        else:
+            return False
+
+    def isNumero(self,caracter):
+        if ((ord(caracter) >= 48 and ord(caracter) <= 57)):
+            return True
+        else:
+            return False
+    def isSimbolo(self,caracter):
+        if ((ord(caracter)==61) or (ord(caracter)==123) or (ord(caracter)==125) or (ord(caracter)==91) or (ord(caracter)==93) or (ord(caracter)==44) or (ord(caracter)==40) or (ord(caracter)==41) or (ord(caracter)==59)):
+            return True
+        else:
+            return False
+    
+
     def AnalisisLexico(self,Texto):
+        contador=0
+        fila = 1
+        columna = 0
+        estado=0
+        Tk_Identificador=''
+        Tk_Simbolo=''
+        Tk_ComillasDobles=''
+        Tk_ComillaSimple=''
+        Tk_Numeral=''
+        Tk_Numero=''
+        Tk_Cadena=''
+        Texto=Texto+'~'
+        for c in Texto:
+            if estado==0:
+                if self.isLetra(c):
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                elif self.isSimbolo(c):
+                    Tk_Simbolo=c
+                    estado=2
+                    contador+=1
+                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo) - 1)),'Simbolo')
+                    self.ListaTokens1.append(token)
+                    Tk_Simbolo=''
+                elif ord(c)==34:
+                    Tk_ComillasDobles=Tk_ComillasDobles+c
+                    contador+=1
+                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles) - 1)),'Comillas Dobles')
+                    self.ListaTokens1.append(token)
+                    Tk_ComillasDobles=''
+                    estado=3
+                #elif ((ord(c)==43) or (ord(c)==45)):
+                    #lexActual=lexActual+c
+                    #estado=5
+                #elif self.isNumero(c):
+                    #lexActual=lexActual+c
+                    #estado=6
+                #elif ord(c)==35:
+                    #lexActual=lexActual+c
+                    #estado=9    
+                #elif ord(c)==39:
+                    #lexActual=lexActual+c
+                    #estado=10
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
+            elif estado==1:
+                if self.isNumero(c):
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                elif self.isLetra(c):
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                elif ord(c)==95:
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                else:
+                    contador+=1
+                    token=Token(contador,Tk_Identificador,fila,str(columna - (len(Tk_Identificador) - 1)),'Palabra Reservada')
+                    self.ListaTokens1.append(token)
+                    Tk_Identificador=''
+                    if self.isSimbolo(c):
+                        Tk_Simbolo=Tk_Simbolo+c
+                        contador+=1
+                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        self.ListaTokens1.append(token)
+                        Tk_Simbolo=''
+                        estado=0 #PENDIENTE
+                        continue
+                    elif self.isLetra(c):
+                        Tk_Identificador=Tk_Identificador+c
+                        estado=1
+                        continue
+                    elif ord(c)==34:
+                        Tk_ComillasDobles=Tk_ComillasDobles+c
+                        contador+=1
+                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        self.ListaTokens1.append(token)
+                        Tk_ComillasDobles=''
+                        estado=3
+                        continue
+                    elif ((ord(c)==43) or (ord(c)==45)):
+                        Tk_Numero=Tk_Numero+c
+                        estado=5
+                        continue
+                    elif self.isNumero(c):
+                        lexActual=lexActual+c
+                        estado=6
+                        continue
+                    elif ord(c)==35:
+                        lexActual=lexActual+c
+                        estado=9    
+                        continue
+                    elif ord(c)==39:
+                        lexActual=lexActual+c
+                        estado=10
+                        continue
+                    elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
+                    estado=0 
+            elif estado==2:
+                if self.isSimbolo(c):
+                    Tk_Simbolo=Tk_Simbolo+c
+                    estado=2
+                    contador+=1
+                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo) - 1)),'Simbolo')
+                    self.ListaTokens1.append(token)
+                    Tk_Simbolo=''
+                else:
+
+
+
+
+
+
+
+
+
+
+
+                    
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
+                    Tk_Simbolo=''
+                    estado=0
+            elif estado==3:
+                if ord(c)!=34:
+                    Tk_Cadena=Tk_Cadena+c
+                    estado=3
+                elif ord(c)==34:
+                    contador+=1
+                    token=Token(contador,Tk_Cadena,fila,str(columna - (len(Tk_Cadena) - 1)),'Cadena')
+                    self.ListaTokens1.append(token)
+                    Tk_Cadena=''
+                    #
+                    Tk_ComillasDobles=Tk_ComillasDobles+c
+                    estado=4
+                else:
+                    if ord(c) == 32 or ord(c) == 9 or ord(c) == 10 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,str(columna - (len(Tk_Cadena) - 1)),'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
+            elif estado==4:
+                contador+=1
+                token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
+                self.ListaTokens1.append(token)      
+                if ord(c) == 32 or ord(c) == 9 or ord(c) == 10 or c=='~':
+                    pass
+                else:
+                    error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                    self.ListaErrores1.append(error)
+                Tk_ComillasDobles=''
+                estado=0
+                
+                
+                  
+
+
+            if (ord(c) == 10):
+                columna = 0
+                fila += 1
+                continue
+        #Tab Horizontal
+            elif (ord(c) == 9):
+                columna += 4
+                continue
+        #Espacio
+            elif (ord(c) == 32):
+                columna += 1
+                continue
+            columna += 1
         
-        pass
+        ##########
+        self.ListaTokens=self.ListaTokens1.copy()
+        self.ListaErrores=self.ListaErrores1.copy() 
+        
+        self.ListaTokens1.clear()
+        self.ListaErrores1.clear()
+
+
+
+    def AccionComboBox(self,event):
+        if self.combo.get()=='Generar Reporte de Errores':
+            #print('ERRORRRRRR')
+            self.Generar_TablaErrores()
+        elif self.combo.get()=='Generar Reporte de Tokens':
+            self.Generar_TablaTokens()
+        elif self.combo.get()=='Generar Árbol de derivación':
+            self.Generar_Arbol()
+
+
     def Generar_TablaTokens(self):
-        pass
+        for x in self.ListaTokens:
+            print(x.Numero,x.lexema,x.fila,x.columna,x.token)
         #
         #
     def Generar_TablaErrores(self):
-        pass
+        for y in self.ListaErrores:
+            print(y.tipoError,y.filaError,y.columnaError,y.descripcion,y.caracter)
+
 
     def Generar_Arbol(self):
         pass

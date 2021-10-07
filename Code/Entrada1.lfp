@@ -4,8 +4,7 @@
 		'''
 		Claves=[
 		"Codigo_Producto", "Nombre del Producto", "Precio Producto", "Fecha de Vencimiento", "Stock"
-		]
-	 	#Seccion de Registros
+		] #Seccion de Registros
 		
 		'''
 		Esta seccion guarda los registros 
