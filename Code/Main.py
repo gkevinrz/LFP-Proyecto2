@@ -146,18 +146,18 @@ class Application():
                     self.ListaTokens1.append(token)
                     Tk_ComillasDobles=''
                     estado=3
-                #elif ((ord(c)==43) or (ord(c)==45)):
-                    #lexActual=lexActual+c
-                    #estado=5
-                #elif self.isNumero(c):
-                    #lexActual=lexActual+c
-                    #estado=6
-                #elif ord(c)==35:
-                    #lexActual=lexActual+c
-                    #estado=9    
-                #elif ord(c)==39:
-                    #lexActual=lexActual+c
-                    #estado=10
+                elif ((ord(c)==43) or (ord(c)==45)):
+                    Tk_Numero=Tk_Numero+c
+                    estado=5
+                elif self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=6
+                elif ord(c)==35:
+                    Tk_Numeral=Tk_Numeral+c
+                    estado=9    
+                elif ord(c)==39:
+                    Tk_ComillaSimple=Tk_ComillaSimple+c
+                    estado=10
                 else:
                     if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
@@ -226,28 +226,51 @@ class Application():
                     Tk_Simbolo=Tk_Simbolo+c
                     estado=2
                     contador+=1
-                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo) - 1)),'Simbolo')
+                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo))),'Simbolo')
                     self.ListaTokens1.append(token)
                     Tk_Simbolo=''
                 else:
-
-
-
-
-
-
-
-
-
-
-
-                    
-                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                    if self.isSimbolo(c):
+                        Tk_Simbolo=Tk_Simbolo+c
+                        contador+=1
+                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        self.ListaTokens1.append(token)
+                        Tk_Simbolo=''
+                        estado=0 #PENDIENTE
+                        continue
+                    elif self.isLetra(c):
+                        Tk_Identificador=Tk_Identificador+c
+                        estado=1
+                        continue
+                    elif ord(c)==34:
+                        Tk_ComillasDobles=Tk_ComillasDobles+c
+                        contador+=1
+                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        self.ListaTokens1.append(token)
+                        Tk_ComillasDobles=''
+                        estado=3
+                        continue
+                    elif ((ord(c)==43) or (ord(c)==45)):
+                        Tk_Numero=Tk_Numero+c
+                        estado=5
+                        continue
+                    elif self.isNumero(c):
+                        lexActual=lexActual+c
+                        estado=6
+                        continue
+                    elif ord(c)==35:
+                        lexActual=lexActual+c
+                        estado=9    
+                        continue
+                    elif ord(c)==39:
+                        lexActual=lexActual+c
+                        estado=10
+                        continue
+                    elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
                     else:
                         error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
                         self.ListaErrores1.append(error)
-                    Tk_Simbolo=''
                     estado=0
             elif estado==3:
                 if ord(c)!=34:
@@ -268,19 +291,200 @@ class Application():
                         error=Error('Lexico',fila,str(columna - (len(Tk_Cadena) - 1)),'Se detecto un caracter invalido',c)
                         self.ListaErrores1.append(error)
             elif estado==4:
+
                 contador+=1
                 token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
-                self.ListaTokens1.append(token)      
-                if ord(c) == 32 or ord(c) == 9 or ord(c) == 10 or c=='~':
+                self.ListaTokens1.append(token)
+                Tk_ComillasDobles=''
+                if self.isSimbolo(c):
+                    Tk_Simbolo=Tk_Simbolo+c
+                    contador+=1
+                    token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                    self.ListaTokens1.append(token)
+                    Tk_Simbolo=''
+                    estado=0 #PENDIENTE
+                    continue
+                elif self.isLetra(c):
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                    continue
+                elif ord(c)==34:
+                    Tk_ComillasDobles=Tk_ComillasDobles+c
+                    contador+=1
+                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                    self.ListaTokens1.append(token)
+                    Tk_ComillasDobles=''
+                    estado=3
+                    continue
+                elif ((ord(c)==43) or (ord(c)==45)):
+                    Tk_Numero=Tk_Numero+c
+                    estado=5
+                    continue
+                elif self.isNumero(c):
+                    lexActual=lexActual+c
+                    estado=6
+                    continue
+                elif ord(c)==35:
+                    lexActual=lexActual+c
+                    estado=9    
+                    continue
+                elif ord(c)==39:
+                    lexActual=lexActual+c
+                    estado=10
+                    continue
+                elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                     pass
                 else:
                     error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
-                    self.ListaErrores1.append(error)
-                Tk_ComillasDobles=''
+                    self.ListaErrores1.append(error)      
                 estado=0
-                
-                
-                  
+            elif estado==5:
+                if self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=6
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
+            elif estado==6:
+                if self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=6
+                elif ord(c)==46:
+                    Tk_Numero=Tk_Numero+c
+                    estado=7
+                else:
+                    contador+=1
+                    token=Token(contador,Tk_Numero,fila,columna,'Numero')
+                    self.ListaTokens1.append(token)
+                    Tk_Numero=''
+                    if self.isSimbolo(c):
+                        Tk_Simbolo=Tk_Simbolo+c
+                        contador+=1
+                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        self.ListaTokens1.append(token)
+                        Tk_Simbolo=''
+                        estado=0 #PENDIENTE
+                        continue
+                    elif self.isLetra(c):
+                        Tk_Identificador=Tk_Identificador+c
+                        estado=1
+                        continue
+                    elif ord(c)==34:
+                        Tk_ComillasDobles=Tk_ComillasDobles+c
+                        contador+=1
+                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        self.ListaTokens1.append(token)
+                        Tk_ComillasDobles=''
+                        estado=3
+                        continue
+                    elif ((ord(c)==43) or (ord(c)==45)):
+                        Tk_Numero=Tk_Numero+c
+                        estado=5
+                        continue
+                    elif self.isNumero(c):
+                        lexActual=lexActual+c
+                        estado=6
+                        continue
+                    elif ord(c)==35:
+                        lexActual=lexActual+c
+                        estado=9    
+                        continue
+                    elif ord(c)==39:
+                        lexActual=lexActual+c
+                        estado=10
+                        continue
+                    elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)      
+                    estado=0
+                    
+            elif estado==7:
+                if self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=8
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)    
+            elif estado==8:
+                if self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=8
+                else:
+                    contador+=1
+                    token=Token(contador,Tk_Numero,fila,columna,'Numero')
+                    self.ListaTokens1.append(token)
+                    Tk_Numero=''
+                    if self.isSimbolo(c):
+                        Tk_Simbolo=Tk_Simbolo+c
+                        contador+=1
+                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        self.ListaTokens1.append(token)
+                        Tk_Simbolo=''
+                        estado=0 #PENDIENTE
+                        continue
+                    elif self.isLetra(c):
+                        Tk_Identificador=Tk_Identificador+c
+                        estado=1
+                        continue
+                    elif ord(c)==34:
+                        Tk_ComillasDobles=Tk_ComillasDobles+c
+                        contador+=1
+                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        self.ListaTokens1.append(token)
+                        Tk_ComillasDobles=''
+                        estado=3
+                        continue
+                    elif ((ord(c)==43) or (ord(c)==45)):
+                        Tk_Numero=Tk_Numero+c
+                        estado=5
+                        continue
+                    elif self.isNumero(c):
+                        lexActual=lexActual+c
+                        estado=6
+                        continue
+                    elif ord(c)==35:
+                        lexActual=lexActual+c
+                        estado=9    
+                        continue
+                    elif ord(c)==39:
+                        lexActual=lexActual+c
+                        estado=10
+                        continue
+                    elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)      
+                    estado=0
+            elif estado==9:
+                pass
+            elif estado==10:
+                pass
+            elif estado==11:
+                pass
+            elif estado==12:
+                pass
+            elif estado==13:
+                pass
+            elif estado==14:
+                pass
+            elif estado==15:
+                pass
+
+
+
+
+
+
+
 
 
             if (ord(c) == 10):
