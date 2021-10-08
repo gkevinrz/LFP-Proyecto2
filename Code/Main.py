@@ -122,8 +122,10 @@ class Application():
         Tk_Identificador=''
         Tk_Simbolo=''
         Tk_ComillasDobles=''
-        Tk_ComillaSimple=''
-        Tk_Numeral=''
+        TK_Numeral=''
+        Tk_CSimple=''
+        Tk_ComentarioMulti=''
+        Tk_ComentarioLinea=''
         Tk_Numero=''
         Tk_Cadena=''
         Texto=Texto+'~'
@@ -153,10 +155,10 @@ class Application():
                     Tk_Numero=Tk_Numero+c
                     estado=6
                 elif ord(c)==35:
-                    Tk_Numeral=Tk_Numeral+c
+                    TK_Numeral=TK_Numeral+c
                     estado=9    
                 elif ord(c)==39:
-                    Tk_ComillaSimple=Tk_ComillaSimple+c
+                    Tk_CSimple=Tk_CSimple+c
                     estado=10
                 else:
                     if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -204,15 +206,15 @@ class Application():
                         estado=5
                         continue
                     elif self.isNumero(c):
-                        lexActual=lexActual+c
+                        Tk_Numero=Tk_Numero+c
                         estado=6
                         continue
                     elif ord(c)==35:
-                        lexActual=lexActual+c
+                        TK_Numeral=TK_Numeral+c
                         estado=9    
                         continue
                     elif ord(c)==39:
-                        lexActual=lexActual+c
+                        Tk_CSimple=Tk_CSimple+c
                         estado=10
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -255,15 +257,15 @@ class Application():
                         estado=5
                         continue
                     elif self.isNumero(c):
-                        lexActual=lexActual+c
+                        Tk_Numero=Tk_Numero+c
                         estado=6
                         continue
                     elif ord(c)==35:
-                        lexActual=lexActual+c
+                        TK_Numeral=TK_Numeral+c
                         estado=9    
                         continue
                     elif ord(c)==39:
-                        lexActual=lexActual+c
+                        Tk_CSimple=Tk_CSimple+c
                         estado=10
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -291,7 +293,6 @@ class Application():
                         error=Error('Lexico',fila,str(columna - (len(Tk_Cadena) - 1)),'Se detecto un caracter invalido',c)
                         self.ListaErrores1.append(error)
             elif estado==4:
-
                 contador+=1
                 token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                 self.ListaTokens1.append(token)
@@ -321,15 +322,15 @@ class Application():
                     estado=5
                     continue
                 elif self.isNumero(c):
-                    lexActual=lexActual+c
+                    Tk_Numero=Tk_Numero+c
                     estado=6
                     continue
                 elif ord(c)==35:
-                    lexActual=lexActual+c
+                    TK_Numeral=TK_Numeral+c
                     estado=9    
                     continue
                 elif ord(c)==39:
-                    lexActual=lexActual+c
+                    Tk_CSimple=Tk_CSimple+c
                     estado=10
                     continue
                 elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -385,15 +386,15 @@ class Application():
                         estado=5
                         continue
                     elif self.isNumero(c):
-                        lexActual=lexActual+c
+                        Tk_Numero=Tk_Numero+c
                         estado=6
                         continue
                     elif ord(c)==35:
-                        lexActual=lexActual+c
+                        TK_Numeral=TK_Numeral+c
                         estado=9    
                         continue
                     elif ord(c)==39:
-                        lexActual=lexActual+c
+                        Tk_CSimple=Tk_CSimple+c
                         estado=10
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -447,15 +448,15 @@ class Application():
                         estado=5
                         continue
                     elif self.isNumero(c):
-                        lexActual=lexActual+c
+                        Tk_Numero=Tk_Numero+c
                         estado=6
                         continue
                     elif ord(c)==35:
-                        lexActual=lexActual+c
+                        TK_Numeral=TK_Numeral+c
                         estado=9    
                         continue
                     elif ord(c)==39:
-                        lexActual=lexActual+c
+                        Tk_CSimple=Tk_CSimple+c
                         estado=10
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -465,20 +466,162 @@ class Application():
                         self.ListaErrores1.append(error)      
                     estado=0
             elif estado==9:
-                pass
+                if ord(c)!=10:
+                    Tk_ComentarioLinea=Tk_ComentarioLinea+c
+                else:
+                    Tk_ComentarioLinea=''
+                    if self.isSimbolo(c):
+                        Tk_Simbolo=Tk_Simbolo+c
+                        contador+=1
+                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        self.ListaTokens1.append(token)
+                        Tk_Simbolo=''
+                        estado=0 #PENDIENTE
+                        continue
+                    elif self.isLetra(c):
+                        Tk_Identificador=Tk_Identificador+c
+                        estado=1
+                        continue
+                    elif ord(c)==34:
+                        Tk_ComillasDobles=Tk_ComillasDobles+c
+                        contador+=1
+                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        self.ListaTokens1.append(token)
+                        Tk_ComillasDobles=''
+                        estado=3
+                        continue
+                    elif ((ord(c)==43) or (ord(c)==45)):
+                        Tk_Numero=Tk_Numero+c
+                        estado=5
+                        continue
+                    elif self.isNumero(c):
+                        Tk_Numero=Tk_Numero+c
+                        estado=6
+                        continue
+                    elif ord(c)==35:
+                        TK_Numeral=TK_Numeral+c
+                        estado=9    
+                        continue
+                    elif ord(c)==39:
+                        Tk_CSimple=Tk_CSimple+c
+                        estado=10
+                        continue
+                    elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)      
+                    estado=0
             elif estado==10:
-                pass
+                if ord(c)==39:
+                    Tk_CSimple=Tk_CSimple+c
+                    estado=11
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)   
             elif estado==11:
-                pass
+                if ord(c)==39:
+                    Tk_CSimple=Tk_CSimple+c
+                    #aqui agregaria el token comilla simple
+                    Tk_CSimple=''
+                    estado=12
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error) 
             elif estado==12:
-                pass
+                if ord(c)!=39:
+                    Tk_ComentarioMulti=Tk_ComentarioMulti+c
+                    estado=12
+                elif ord(c)==39:
+                    #aqui agregaria el token comentario
+                    Tk_ComentarioMulti=''
+                    Tk_CSimple=Tk_CSimple+c
+                    estado=13
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)      
             elif estado==13:
-                pass
+                if ord(c)==39:
+                    Tk_CSimple=Tk_CSimple+c
+                    estado=14
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
             elif estado==14:
-                pass
+                if ord(c)==39:
+                    Tk_CSimple=Tk_CSimple+c
+                    estado=15
+                else:
+                    if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                        pass
+                    else:
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                        self.ListaErrores1.append(error)
             elif estado==15:
-                pass
+                Tk_CSimple=''
+                if self.isSimbolo(c):
+                    Tk_Simbolo=Tk_Simbolo+c
+                    contador+=1
+                    token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                    self.ListaTokens1.append(token)
+                    Tk_Simbolo=''
+                    estado=0 #PENDIENTE
+                    continue
+                elif self.isLetra(c):
+                    Tk_Identificador=Tk_Identificador+c
+                    estado=1
+                    continue
+                elif ord(c)==34:
+                    Tk_ComillasDobles=Tk_ComillasDobles+c
+                    contador+=1
+                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                    self.ListaTokens1.append(token)
+                    Tk_ComillasDobles=''
+                    estado=3
+                    continue
+                elif ((ord(c)==43) or (ord(c)==45)):
+                    Tk_Numero=Tk_Numero+c
+                    estado=5
+                    continue
+                elif self.isNumero(c):
+                    Tk_Numero=Tk_Numero+c
+                    estado=6
+                    continue
+                elif ord(c)==35:
+                    TK_Numeral=TK_Numeral+c
+                    estado=9    
+                    continue
+                elif ord(c)==39:
+                    Tk_CSimple=Tk_CSimple+c
+                    estado=10
+                    continue
+                elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
+                    pass
+                else:
+                    error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
+                    self.ListaErrores1.append(error)      
+                estado=0
 
+
+      
+
+
+
+
+
+                
 
 
 
@@ -521,13 +664,194 @@ class Application():
 
 
     def Generar_TablaTokens(self):
-        for x in self.ListaTokens:
-            print(x.Numero,x.lexema,x.fila,x.columna,x.token)
+        tokenshtml=open(f'Tabla de Tokens/index.html','w')
+        txtokens=''
+        txtokens+="""
+        <!DOCTYPE html> 
+        <html lang="en">
+        <head>
+	    <title>Tabla de Tokens</title>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--===============================================================================================-->	
+	    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="css/util.css">
+	    <link rel="stylesheet" type="text/css" href="css/main.css">
+        <!--===============================================================================================-->
+        </head>
+        <div class="header">
+        <h1>Tabla de Tokens</h1>
+        </div>
+        <body>
+	    <div class="limiter">
+		<div class="container-table100">
+		<div class="wrap-table100">
+		<div class="table100 ver1 m-b-110">
+		<div class="table100-head">
+		<table>
+		<thead>
+		<tr class="row100 head">
+		<th class="cell100 column1">No.</th>
+		<th class="cell100 column2">Token</th>
+		<th class="cell100 column3">Lexema</th>
+		<th class="cell100 column4">Fila</th>
+		<th class="cell100 column5">Columna</th>
+		</tr>
+		</thead>
+		</table>
+		</div>
+		<div class="table100-body js-pscroll">
+		<table>
+		<tbody>"""
+        for ob in self.ListaTokens:
+            txtokens+=f"""<tr class="row100 body">
+            <td class="cell100 column1">{ob.Numero}</td>
+			<td class="cell100 column2">{ob.token}</td>
+			<td class="cell100 column3">{ob.lexema}</td>
+			<td class="cell100 column4">{ob.fila}</td>
+			<td class="cell100 column5">{ob.columna}</td>
+			</tr>"""
+        txtokens+="""
+		</table>
+		</div>
+		</div>
+		</div>
+		</div>
+	    </div>
+        <!--===============================================================================================-->	
+	    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/bootstrap/js/popper.js"></script>
+	    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/select2/select2.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	    <script>
+		$('.js-pscroll').each(function(){
+		var ps = new PerfectScrollbar(this);
+		$(window).on('resize', function(){
+        ps.update();
+		})
+		});
+			
+		
+	    </script>
+        <!--===============================================================================================-->
+	    <script src="js/main.js"></script>
+        </body>
+        </html>
+        """
+        tokenshtml.write(txtokens)
+        tokenshtml.close()
+        #for x in self.ListaTokens:
+        #    print(x.Numero,x.lexema,x.fila,x.columna,x.token)
         #
         #
     def Generar_TablaErrores(self):
-        for y in self.ListaErrores:
-            print(y.tipoError,y.filaError,y.columnaError,y.descripcion,y.caracter)
+        erroreshtml=open('Tabla de Errores/index.html','w')
+        txtError=''
+        txtError+="""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+	    <title>Tabla de Errores</title>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--===============================================================================================-->	
+	    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+        <!--===============================================================================================-->
+        <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="css/util.css">
+	    <link rel="stylesheet" type="text/css" href="css/main.css">
+        <!--===============================================================================================-->
+        </head>
+        <div class="header">
+        <h1>Tabla de Errores</h1>
+        </div>
+        <body>
+	    <div class="limiter">
+		<div class="container-table100">
+		<div class="wrap-table100">	
+		<div class="table100 ver3 m-b-110">
+		<div class="table100-head">
+		<table>
+		<thead>
+		<tr class="row100 head">
+		<th class="cell100 column1">Tipo de Error</th>
+		<th class="cell100 column2">Caracter</th>
+		<th class="cell100 column3">Descripción</th>
+		<th class="cell100 column4">Fila</th>
+		<th class="cell100 column5">Columna</th>
+		</tr>
+		</thead>
+		</table>
+		</div>
+		<div class="table100-body js-pscroll">
+        <table>
+		<tbody>"""
+        for a in self.ListaErrores:
+            txtError+=f"""<tr class="row100 body">
+			<td class="cell100 column1">{a.tipoError}</td>
+			<td class="cell100 column2">{a.caracter}</td>
+			<td class="cell100 column3">{a.descripcion}</td>
+			<td class="cell100 column4">{a.filaError}</td>
+			<td class="cell100 column5">{a.columnaError}</td>
+			</tr>"""
+        txtError+="""
+        </tbody>
+		</table>
+		</div>
+		</div>	
+		</div>
+		</div>
+	    </div>
+        <!--===============================================================================================-->	
+	    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/bootstrap/js/popper.js"></script>
+	    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/select2/select2.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	    <script>
+		$('.js-pscroll').each(function(){
+		var ps = new PerfectScrollbar(this);
+		$(window).on('resize', function(){
+		ps.update();
+		})
+		});
+	    </script>
+        <!--===============================================================================================-->
+	    <script src="js/main.js"></script>
+        </body>
+        </html>
+        """
+        erroreshtml.write(txtError)
+        erroreshtml.close()
+        #for y in self.ListaErrores:
+        #    print(y.tipoError,y.filaError,y.columnaError,y.descripcion,y.caracter)
 
 
     def Generar_Arbol(self):
