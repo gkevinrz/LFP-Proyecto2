@@ -42,12 +42,15 @@ class Application():
         ##
         self.TextoEntrada = Text(self.root, height=20, width=50)
         scroll = Scrollbar(self.root, command=self.TextoEntrada.yview)
-        self.TextoEntrada.configure(yscrollcommand=scroll.set,bg='#fdfefe',foreground='black',font=('Segoe UI', 12,))
+        scrollh=Scrollbar(self.root,command=self.TextoEntrada.xview,orient=HORIZONTAL)
+        self.TextoEntrada.configure(yscrollcommand=scroll.set,xscrollcommand=scrollh.set,bg='#fdfefe',foreground='black',font=('Segoe UI', 12,))
         self.TextoEntrada.place(x=40, y=150,width=800,height=540)
         ##
         self.TextConsola=Text (self.root, height=20, width=50)   
         scrollConsola=Scrollbar(self.root,command=self.TextConsola.yview)
-        self.TextConsola.configure(yscrollcommand=scrollConsola.set,state=NORMAL,background='#000000',font=('Segoe UI', 12,),foreground='white',insertbackground='white')
+        scrollh2=Scrollbar(self.root,command=self.TextConsola.xview,orient=HORIZONTAL)
+
+        self.TextConsola.configure(yscrollcommand=scrollConsola.set,xscrollcommand=scrollh2.set,state=NORMAL,background='#000000',font=('Segoe UI', 12,),foreground='white',insertbackground='white')
         self.TextConsola.place(x=900, y=150,width=400,height=540)
 
         scrollConsola.pack(expand=True,padx=10, fill=Y)
@@ -55,6 +58,13 @@ class Application():
         ##
         scroll.pack(expand=True,padx=10, fill=Y)
         scroll.place(x=823,y=150,height=540)
+
+        scrollh.pack(expand=True,padx=10,fill=X)
+        scrollh.place(x=40,y=677,width=800)
+        scrollh2.pack(expand=True,fill='x')
+        scrollh2.place(x=890,y=673,width=400)
+
+
         self.combo.bind('<<ComboboxSelected>>', self.AccionComboBox)
 
     def select_file(self):
@@ -138,13 +148,15 @@ class Application():
                     Tk_Simbolo=c
                     estado=2
                     contador+=1
-                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo) - 1)),'Simbolo')
+                    #columna += 1
+                    token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                     self.ListaTokens1.append(token)
                     Tk_Simbolo=''
                 elif ord(c)==34:
                     Tk_ComillasDobles=Tk_ComillasDobles+c
                     contador+=1
-                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles) - 1)),'Comillas Dobles')
+                    #columna += 1
+                    token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                     self.ListaTokens1.append(token)
                     Tk_ComillasDobles=''
                     estado=3
@@ -184,19 +196,22 @@ class Application():
                     if self.isSimbolo(c):
                         Tk_Simbolo=Tk_Simbolo+c
                         contador+=1
-                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        columna += 1
+                        token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                         self.ListaTokens1.append(token)
                         Tk_Simbolo=''
-                        estado=0 #PENDIENTE
+                        estado=2 #PENDIENTE
                         continue
                     elif self.isLetra(c):
                         Tk_Identificador=Tk_Identificador+c
                         estado=1
+                        columna += 1
                         continue
                     elif ord(c)==34:
                         Tk_ComillasDobles=Tk_ComillasDobles+c
                         contador+=1
-                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        columna += 1
+                        token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                         self.ListaTokens1.append(token)
                         Tk_ComillasDobles=''
                         estado=3
@@ -204,18 +219,22 @@ class Application():
                     elif ((ord(c)==43) or (ord(c)==45)):
                         Tk_Numero=Tk_Numero+c
                         estado=5
+                        columna += 1
                         continue
                     elif self.isNumero(c):
                         Tk_Numero=Tk_Numero+c
                         estado=6
+                        columna += 1
                         continue
                     elif ord(c)==35:
                         TK_Numeral=TK_Numeral+c
-                        estado=9    
+                        estado=9
+                        columna += 1    
                         continue
                     elif ord(c)==39:
                         Tk_CSimple=Tk_CSimple+c
                         estado=10
+                        columna += 1
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
@@ -228,44 +247,53 @@ class Application():
                     Tk_Simbolo=Tk_Simbolo+c
                     estado=2
                     contador+=1
-                    token=Token(contador,Tk_Simbolo,fila,str(columna - (len(Tk_Simbolo))),'Simbolo')
+                    #contador+=1
+                    #columna += 1
+                    token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                     self.ListaTokens1.append(token)
                     Tk_Simbolo=''
                 else:
                     if self.isSimbolo(c):
                         Tk_Simbolo=Tk_Simbolo+c
                         contador+=1
-                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        columna += 1
+                        token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                         self.ListaTokens1.append(token)
                         Tk_Simbolo=''
                         estado=0 #PENDIENTE
                         continue
                     elif self.isLetra(c):
                         Tk_Identificador=Tk_Identificador+c
+                        columna += 1
                         estado=1
                         continue
                     elif ord(c)==34:
                         Tk_ComillasDobles=Tk_ComillasDobles+c
                         contador+=1
-                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        columna += 1
+                        token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                         self.ListaTokens1.append(token)
                         Tk_ComillasDobles=''
                         estado=3
                         continue
                     elif ((ord(c)==43) or (ord(c)==45)):
                         Tk_Numero=Tk_Numero+c
+                        columna += 1
                         estado=5
                         continue
                     elif self.isNumero(c):
                         Tk_Numero=Tk_Numero+c
+                        columna += 1
                         estado=6
                         continue
                     elif ord(c)==35:
                         TK_Numeral=TK_Numeral+c
+                        columna += 1
                         estado=9    
                         continue
                     elif ord(c)==39:
                         Tk_CSimple=Tk_CSimple+c
+                        columna += 1
                         estado=10
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
@@ -290,7 +318,7 @@ class Application():
                     if ord(c) == 32 or ord(c) == 9 or ord(c) == 10 or c=='~':
                         pass
                     else:
-                        error=Error('Lexico',fila,str(columna - (len(Tk_Cadena) - 1)),'Se detecto un caracter invalido',c)
+                        error=Error('Lexico',fila,columna,'Se detecto un caracter invalido',c)
                         self.ListaErrores1.append(error)
             elif estado==4:
                 contador+=1
@@ -300,7 +328,8 @@ class Application():
                 if self.isSimbolo(c):
                     Tk_Simbolo=Tk_Simbolo+c
                     contador+=1
-                    token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                    columna += 1
+                    token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                     self.ListaTokens1.append(token)
                     Tk_Simbolo=''
                     estado=0 #PENDIENTE
@@ -308,11 +337,13 @@ class Application():
                 elif self.isLetra(c):
                     Tk_Identificador=Tk_Identificador+c
                     estado=1
+                    columna += 1
                     continue
                 elif ord(c)==34:
                     Tk_ComillasDobles=Tk_ComillasDobles+c
                     contador+=1
-                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                    columna += 1
+                    token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                     self.ListaTokens1.append(token)
                     Tk_ComillasDobles=''
                     estado=3
@@ -320,18 +351,22 @@ class Application():
                 elif ((ord(c)==43) or (ord(c)==45)):
                     Tk_Numero=Tk_Numero+c
                     estado=5
+                    columna += 1
                     continue
                 elif self.isNumero(c):
                     Tk_Numero=Tk_Numero+c
                     estado=6
+                    columna += 1
                     continue
                 elif ord(c)==35:
                     TK_Numeral=TK_Numeral+c
-                    estado=9    
+                    estado=9   
+                    columna += 1 
                     continue
                 elif ord(c)==39:
                     Tk_CSimple=Tk_CSimple+c
                     estado=10
+                    columna += 1
                     continue
                 elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                     pass
@@ -364,7 +399,8 @@ class Application():
                     if self.isSimbolo(c):
                         Tk_Simbolo=Tk_Simbolo+c
                         contador+=1
-                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        columna += 1
+                        token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                         self.ListaTokens1.append(token)
                         Tk_Simbolo=''
                         estado=0 #PENDIENTE
@@ -372,11 +408,13 @@ class Application():
                     elif self.isLetra(c):
                         Tk_Identificador=Tk_Identificador+c
                         estado=1
+                        columna += 1
                         continue
                     elif ord(c)==34:
                         Tk_ComillasDobles=Tk_ComillasDobles+c
                         contador+=1
-                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        columna += 1
+                        token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                         self.ListaTokens1.append(token)
                         Tk_ComillasDobles=''
                         estado=3
@@ -384,18 +422,22 @@ class Application():
                     elif ((ord(c)==43) or (ord(c)==45)):
                         Tk_Numero=Tk_Numero+c
                         estado=5
+                        columna += 1
                         continue
                     elif self.isNumero(c):
                         Tk_Numero=Tk_Numero+c
                         estado=6
+                        columna += 1
                         continue
                     elif ord(c)==35:
                         TK_Numeral=TK_Numeral+c
-                        estado=9    
+                        estado=9   
+                        columna += 1 
                         continue
                     elif ord(c)==39:
                         Tk_CSimple=Tk_CSimple+c
                         estado=10
+                        columna += 1
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
@@ -426,7 +468,8 @@ class Application():
                     if self.isSimbolo(c):
                         Tk_Simbolo=Tk_Simbolo+c
                         contador+=1
-                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        columna += 1
+                        token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                         self.ListaTokens1.append(token)
                         Tk_Simbolo=''
                         estado=0 #PENDIENTE
@@ -434,11 +477,13 @@ class Application():
                     elif self.isLetra(c):
                         Tk_Identificador=Tk_Identificador+c
                         estado=1
+                        columna += 1
                         continue
                     elif ord(c)==34:
                         Tk_ComillasDobles=Tk_ComillasDobles+c
                         contador+=1
-                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        columna += 1
+                        token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                         self.ListaTokens1.append(token)
                         Tk_ComillasDobles=''
                         estado=3
@@ -446,18 +491,22 @@ class Application():
                     elif ((ord(c)==43) or (ord(c)==45)):
                         Tk_Numero=Tk_Numero+c
                         estado=5
+                        columna += 1
                         continue
                     elif self.isNumero(c):
                         Tk_Numero=Tk_Numero+c
                         estado=6
+                        columna += 1
                         continue
                     elif ord(c)==35:
                         TK_Numeral=TK_Numeral+c
                         estado=9    
+                        columna += 1
                         continue
                     elif ord(c)==39:
                         Tk_CSimple=Tk_CSimple+c
                         estado=10
+                        columna += 1
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
@@ -473,7 +522,8 @@ class Application():
                     if self.isSimbolo(c):
                         Tk_Simbolo=Tk_Simbolo+c
                         contador+=1
-                        token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                        columna += 1
+                        token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                         self.ListaTokens1.append(token)
                         Tk_Simbolo=''
                         estado=0 #PENDIENTE
@@ -481,11 +531,13 @@ class Application():
                     elif self.isLetra(c):
                         Tk_Identificador=Tk_Identificador+c
                         estado=1
+                        columna += 1
                         continue
                     elif ord(c)==34:
                         Tk_ComillasDobles=Tk_ComillasDobles+c
                         contador+=1
-                        token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                        columna += 1
+                        token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                         self.ListaTokens1.append(token)
                         Tk_ComillasDobles=''
                         estado=3
@@ -493,18 +545,22 @@ class Application():
                     elif ((ord(c)==43) or (ord(c)==45)):
                         Tk_Numero=Tk_Numero+c
                         estado=5
+                        columna += 1
                         continue
                     elif self.isNumero(c):
                         Tk_Numero=Tk_Numero+c
                         estado=6
+                        columna += 1
                         continue
                     elif ord(c)==35:
                         TK_Numeral=TK_Numeral+c
                         estado=9    
+                        columna += 1
                         continue
                     elif ord(c)==39:
                         Tk_CSimple=Tk_CSimple+c
                         estado=10
+                        columna += 1
                         continue
                     elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                         pass
@@ -574,7 +630,8 @@ class Application():
                 if self.isSimbolo(c):
                     Tk_Simbolo=Tk_Simbolo+c
                     contador+=1
-                    token=Token(contador,Tk_Simbolo,fila,columna - (len(Tk_Simbolo)),'Simbolo')
+                    columna += 1
+                    token=Token(contador,Tk_Simbolo,fila,columna,'Simbolo')
                     self.ListaTokens1.append(token)
                     Tk_Simbolo=''
                     estado=0 #PENDIENTE
@@ -582,11 +639,13 @@ class Application():
                 elif self.isLetra(c):
                     Tk_Identificador=Tk_Identificador+c
                     estado=1
+                    columna += 1
                     continue
                 elif ord(c)==34:
                     Tk_ComillasDobles=Tk_ComillasDobles+c
                     contador+=1
-                    token=Token(contador,Tk_ComillasDobles,fila,str(columna - (len(Tk_ComillasDobles))),'Comillas Dobles')
+                    columna += 1
+                    token=Token(contador,Tk_ComillasDobles,fila,columna,'Comillas Dobles')
                     self.ListaTokens1.append(token)
                     Tk_ComillasDobles=''
                     estado=3
@@ -594,18 +653,22 @@ class Application():
                 elif ((ord(c)==43) or (ord(c)==45)):
                     Tk_Numero=Tk_Numero+c
                     estado=5
+                    columna += 1
                     continue
                 elif self.isNumero(c):
                     Tk_Numero=Tk_Numero+c
                     estado=6
+                    columna += 1
                     continue
                 elif ord(c)==35:
                     TK_Numeral=TK_Numeral+c
                     estado=9    
+                    columna += 1
                     continue
                 elif ord(c)==39:
                     Tk_CSimple=Tk_CSimple+c
                     estado=10
+                    columna += 1
                     continue
                 elif ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c=='~':
                     pass
@@ -616,20 +679,6 @@ class Application():
 
 
       
-
-
-
-
-
-                
-
-
-
-
-
-
-
-
             if (ord(c) == 10):
                 columna = 0
                 fila += 1
