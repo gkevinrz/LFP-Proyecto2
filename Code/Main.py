@@ -3,13 +3,14 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
-from token import LEFTSHIFTEQUAL
+from token import ENCODING, LEFTSHIFTEQUAL
 from Error import Error
 from Token import Token
 
 class Application():
     def __init__(self):
         self.root = Tk()
+        self.root.call('encoding', 'system', 'utf-8')
         self.root.title('SolutionPy')     
         self.root.iconbitmap('Image/Chart.ico')
         self.root.config(bg='#f0f3f4')
@@ -75,16 +76,21 @@ class Application():
         self.combo.bind('<<ComboboxSelected>>', self.AccionComboBox)
 
     def select_file(self):
+      
         filetypes = (('Archivos lfp', '*.lfp'),('Todos los archivos', '*.*'))
-        archivo = filedialog.askopenfile(title='Abrir un archivo',initialdir='./',filetypes=filetypes)
-        if archivo is None:
-            messagebox.showerror(title='Error', message='No se eligió ningún archivo')
-            return None
-        else:
-            self.text = archivo.read()
-            archivo.close()
+        try:
+            a=open(filedialog.askopenfilename(title='Abrir un archivo',filetypes=filetypes,initialdir='./'),'r',encoding='utf-8')
+            self.text = a.read()
+            a.close()
             messagebox.showinfo(title='Información', message='Archivo cargado exitosamente')
             self.TextoEntrada.insert(INSERT,self.text)
+        except FileNotFoundError:
+            messagebox.showerror(title='Error', message='No se eligió ningún archivo')
+            return None
+
+        #archivo = filedialog.askopenfile(title='Abrir un archivo',initialdir='./',filetypes=filetypes)
+
+      
 
 
 
@@ -701,14 +707,18 @@ class Application():
             columna += 1
         
         ##########
+        acept=Token(contador+1,'~',None,None,'Aceptacion')
+        self.ListaTokens1.append(acept)
         self.ListaTokens=self.ListaTokens1.copy()
         self.ListaErrores=self.ListaErrores1.copy() 
+        self.estado_inicial()
+
 
 
 
      
     def estado_inicial(self):
-        pass
+        self.p_CLaves1()
     def p_CLaves1(self):
         if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='Claves':
             self.ListaTokens.pop(0)
@@ -764,7 +774,31 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o ]',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+    def ver_Registros(self):
+        if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='Registros':
+            self.ListaTokens.pop(0)
+            self.ver_Registros2()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Registros',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
 
+    def ver_Registros2(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='=':
+            self.ListaTokens.pop(0)
+            self.ver_Registros3()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba =',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+
+    def ver_Registros3(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='[':
+            self.ListaTokens.pop(0)
+            self.ver_ListaRegistros()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba [',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+    def ver_ListaRegistros(self):
+        pass
 
     
 
@@ -846,13 +880,16 @@ class Application():
 		<table>
 		<tbody>"""
         for ob in self.ListaTokens:
-            txtokens+=f"""<tr class="row100 body">
-            <td class="cell100 column1">{ob.Numero}</td>
-			<td class="cell100 column2">{ob.token}</td>
-			<td class="cell100 column3">{ob.lexema}</td>
-			<td class="cell100 column4">{ob.fila}</td>
-			<td class="cell100 column5">{ob.columna}</td>
-			</tr>"""
+            if ob.lexema=='~' and ob.token=='Aceptacion':
+                pass
+            else:
+                txtokens+=f"""<tr class="row100 body">
+                <td class="cell100 column1">{ob.Numero}</td>
+			    <td class="cell100 column2">{ob.token}</td>
+			    <td class="cell100 column3">{ob.lexema}</td>
+			    <td class="cell100 column4">{ob.fila}</td>
+			    <td class="cell100 column5">{ob.columna}</td>
+			    </tr>"""
         txtokens+="""
 		</table>
 		</div>
