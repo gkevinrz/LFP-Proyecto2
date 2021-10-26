@@ -25,6 +25,7 @@ class Application():
 
 
         self.Claves=[]
+        self.Registros1=[]
         self.Registros=[]
         self.Comandos=[]
     def create_widgets(self):
@@ -774,6 +775,9 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o ]',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+
+            ##########################################
+
     def ver_Registros(self):
         if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='Registros':
             self.ListaTokens.pop(0)
@@ -798,7 +802,72 @@ class Application():
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba [',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
     def ver_ListaRegistros(self):
-        pass
+        self.ver_Registro()
+
+    def ver_Registro(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='{':
+            self.ListaTokens.pop(0)
+            self.Ver_ListaElementoRegistro()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba {',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+    def Ver_ListaElementoRegistro(self):
+        self.Ver_ElementoRegistro()
+    
+    def Ver_ElementoRegistro(self):
+        if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena':
+                self.Registros1.append(self.ListaTokens[0].lexema)
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"':
+                    self.ListaTokens.pop(0)
+                    self.ver_ListaElementoRegistro_p()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error)
+
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        else:
+            if self.ListaTokens[0].token=='Numero':
+                if self.ListaTokens[0].lexema.isdigit():
+                    self.Registros1.append(int(self.ListaTokens[0].lexema))
+                else:
+                    self.Registros1.append(float(self.ListaTokens[0].lexema))
+                self.ListaTokens.pop(0)    
+                self.ver_ListaElementoRegistro_p()
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba numero o Comillas Dobles',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+       
+
+
+    def ver_ListaElementoRegistro_p(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==',':
+            self.ListaTokens.pop(0)
+            self.Ver_ListaElementoRegistro()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='}':
+            s=self.Registros1.copy()
+            self.Registros.append(s)
+            self.Registros1.clear()
+            self.ListaTokens.pop(0)
+            self.Ver_ListaRegistro_P()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o }',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+    def Ver_ListaRegistro_P(self):
+        if self.ListaTokens[0].lexema=='{' and self.ListaTokens[0].token=='Simbolo':
+            self.ListaTokens.pop(0)
+            self.Ver_ListaElementoRegistro()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==']':
+            self.ListaTokens.pop(0)
+            #print(self.Registros)
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba { o ]',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error) 
+
 
     
 
