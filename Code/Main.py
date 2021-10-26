@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
+from token import LEFTSHIFTEQUAL
 from Error import Error
 from Token import Token
 
@@ -18,7 +19,13 @@ class Application():
         self.ListaTokens1=[]
         self.ListaErrores=[]
         self.ListaTokens=[]
+        self.PalabrasReservadas=['Claves','Registros','imprimir','imprimirln','conteo','promedio','contarsi','datos','sumar','max','min','exportarReporte']
+        self.PalabrasReservadasDatos=[]
 
+
+        self.Claves=[]
+        self.Registros=[]
+        self.Comandos=[]
     def create_widgets(self):
         #Menu=ttk.Notebook(self.root)
         s =ttk.Style()
@@ -696,9 +703,84 @@ class Application():
         ##########
         self.ListaTokens=self.ListaTokens1.copy()
         self.ListaErrores=self.ListaErrores1.copy() 
-        
-        self.ListaTokens1.clear()
-        self.ListaErrores1.clear()
+
+
+
+     
+    def estado_inicial(self):
+        pass
+    def p_CLaves1(self):
+        if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='Claves':
+            self.ListaTokens.pop(0)
+            self.p_Claves2()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Claves',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+    def p_Claves2(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='=':
+            self.ListaTokens.pop(0)
+            self.p_Claves3()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba =',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+    def p_Claves3(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='[':
+            self.ListaTokens.pop(0)
+            self.ver_ListaClaves()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba [',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+
+    def ver_ListaClaves(self):
+        self.ver_elemento()
+
+    def ver_elemento(self):
+        if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena':
+                self.Claves.append(self.ListaTokens[0].lexema)
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"':
+                    self.ListaTokens.pop(0)
+                    self.ver_ListaClaves_p()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error)
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+
+
+    def ver_ListaClaves_p(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==',':
+            self.ListaTokens.pop(0)
+            self.ver_ListaClaves()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==']':
+            self.ListaTokens.pop(0)
+            self.ver_Registros()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o ]',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
+
+
+    
+
+
+
+
+    ##############################33
+    def p_Registros(self):
+        pass
+    def A_prima(self):
+        pass
+
+
+
+        #self.ListaTokens1.clear()
+        #self.ListaErrores1.clear()
 
 
 
