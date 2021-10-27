@@ -1,3 +1,4 @@
+#from _typeshed import SupportsItemAccess
 from os import lseek
 from tkinter import *
 from tkinter import ttk
@@ -28,6 +29,10 @@ class Application():
         self.Registros1=[]
         self.Registros=[]
         self.Comandos=[]
+        self.instruccion=''
+        self.campo=''
+        self.cadenaimprimir=''
+        self.valorcomparar=''
     def create_widgets(self):
         #Menu=ttk.Notebook(self.root)
         s =ttk.Style()
@@ -49,24 +54,29 @@ class Application():
         self.combo['values']=['Generar Reporte de Errores','Generar Reporte de Tokens','Generar Árbol de derivación']
         
         ##
-        self.TextoEntrada = Text(self.root, height=20, width=50)
+        self.TextoEntrada = Text(self.root, height=25, width=89, wrap='none')
+        
         scroll = Scrollbar(self.root, command=self.TextoEntrada.yview)
-        scrollh=Scrollbar(self.root,command=self.TextoEntrada.xview,orient=HORIZONTAL)
+        scrollh=Scrollbar(self.root,orient=HORIZONTAL,command=self.TextoEntrada.xview)
         self.TextoEntrada.configure(yscrollcommand=scroll.set,xscrollcommand=scrollh.set,bg='#fdfefe',foreground='black',font=('Segoe UI', 12,))
-        self.TextoEntrada.place(x=40, y=150,width=800,height=540)
+        #self.TextoEntrada.place(x=40, y=150,width=820,height=540)
+        self.TextoEntrada.place(x=40,y=150)
+        #scrollh.config()
+        self.TextoEntrada.yview('end')
         ##
-        self.TextConsola=Text (self.root, height=20, width=50)   
+        self.TextConsola=Text (self.root, height=25, width=44, wrap='none')   
         scrollConsola=Scrollbar(self.root,command=self.TextConsola.yview)
         scrollh2=Scrollbar(self.root,command=self.TextConsola.xview,orient=HORIZONTAL)
 
-        self.TextConsola.configure(yscrollcommand=scrollConsola.set,xscrollcommand=scrollh2.set,state=NORMAL,background='#000000',font=('Segoe UI', 12,),foreground='white',insertbackground='white')
-        self.TextConsola.place(x=900, y=150,width=400,height=540)
+        self.TextConsola.configure(yscrollcommand=scrollConsola.set,xscrollcommand=scrollh2.set,background='#000000',font=('Segoe UI', 12,),foreground='white',insertbackground='white')
+        self.TextConsola.place(x=900, y=150)
+        self.TextConsola.yview('end')
 
         scrollConsola.pack(expand=True,padx=10, fill=Y)
         scrollConsola.place(x=1290,y=150,height=540)
         ##
         scroll.pack(expand=True,padx=10, fill=Y)
-        scroll.place(x=823,y=150,height=540)
+        scroll.place(x=843,y=150,height=540)
 
         scrollh.pack(expand=True,padx=10,fill=X)
         scrollh.place(x=40,y=677,width=800)
@@ -84,7 +94,7 @@ class Application():
             self.text = a.read()
             a.close()
             messagebox.showinfo(title='Información', message='Archivo cargado exitosamente')
-            self.TextoEntrada.insert(INSERT,self.text)
+            self.TextoEntrada.insert(END,self.text)
         except FileNotFoundError:
             messagebox.showerror(title='Error', message='No se eligió ningún archivo')
             return None
@@ -863,27 +873,409 @@ class Application():
             self.Ver_ListaElementoRegistro()
         elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==']':
             self.ListaTokens.pop(0)
+            self.ver_Reportes()
             #print(self.Registros)
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba { o ]',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error) 
+    ############################################
+    def ver_Reportes(self):
+        #print(self.ListaTokens[-1].lexema, self.ListaTokens[-1].token)
+        if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='imprimir':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='imprimirln':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='exportarReporte':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='conteo':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='datos':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='promedio':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()     
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='max':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='sumar':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='min':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()
+        elif self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='contarsi':
+            self.instruccion=self.ListaTokens[0].lexema
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2()   
+        elif self.ListaTokens[0].lexema=='~' and self.ListaTokens[0].token=='Aceptacion':
+            print(self.Comandos)
+            self.acciones()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una instrucción',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error) 
+
+    def ver_Reportes2(self):
+        print(self.instruccion)
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='(':
+            self.ListaTokens.pop(0)
+            self.verCampo()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba (',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error) 
+        
+    def verCampo(self):
+        if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimir':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='imprimir':
+                self.cadenaimprimir=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimir':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error) 
+
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimirln':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='imprimirln':
+                self.cadenaimprimir=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimirln':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='exportarReporte':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='exportarReporte':
+                self.cadenaimprimir=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='exportarReporte':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')' and self.instruccion=='conteo':
+            self.ListaTokens.pop(0)
+            self.ver_Reportes4()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')' and self.instruccion=='datos':
+            self.ListaTokens.pop(0)
+            self.ver_Reportes4()
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='promedio':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='promedio' and self.isClave(self.ListaTokens[0].lexema):
+                self.campo=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='promedio':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='max':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='max' and self.isClave(self.ListaTokens[0].lexema):
+                self.campo=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='max':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='min':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='min' and self.isClave(self.ListaTokens[0].lexema):
+                self.campo=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='min':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='sumar':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='sumar' and self.isClave(self.ListaTokens[0].lexema):
+                self.campo=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='sumar':
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
+        
 
 
+
+
+
+
+
+
+
+
+
+
+
+        else:
+            pass
+    def ver_Reportes3(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')':
+            self.ListaTokens.pop(0)
+            self.ver_Reportes4()
+        else:
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba )',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error) 
+    def ver_Reportes4(self):
+        if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='imprimir':
+            listatemporal=[self.instruccion,self.cadenaimprimir]
+            ls=listatemporal.copy()
+            self.Comandos.append(ls)
+            listatemporal.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.cadenaimprimir=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='imprimirln':
+            listatemporal=[self.instruccion,self.cadenaimprimir]
+            ls=listatemporal.copy()
+            self.Comandos.append(ls)
+            listatemporal.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.cadenaimprimir=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='exportarReporte':
+            listatemporal=[self.instruccion,self.cadenaimprimir]
+            ls=listatemporal.copy()
+            self.Comandos.append(ls)
+            listatemporal.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.cadenaimprimir=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='conteo':
+            listatemporal1=[self.instruccion]
+            ls1=listatemporal1.copy()
+            self.Comandos.append(ls1)
+            listatemporal1.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='datos':
+            listatemporal1=[self.instruccion]
+            ls1=listatemporal1.copy()
+            self.Comandos.append(ls1)
+            listatemporal1.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='promedio':
+            listatemporal2=[self.instruccion,self.campo]
+            ls2=listatemporal2.copy()
+            self.Comandos.append(ls2)
+            listatemporal2.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.campo=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='max':
+            listatemporal2=[self.instruccion,self.campo]
+            ls2=listatemporal2.copy()
+            self.Comandos.append(ls2)
+            listatemporal2.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.campo=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='min':
+            listatemporal2=[self.instruccion,self.campo]
+            ls2=listatemporal2.copy()
+            self.Comandos.append(ls2)
+            listatemporal2.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.campo=''
+            self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='sumar':
+            listatemporal2=[self.instruccion,self.campo]
+            ls2=listatemporal2.copy()
+            self.Comandos.append(ls2)
+            listatemporal2.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.campo=''
+            self.ver_Reportes()
+
+
+
+
+
+     
+        else:
+            pass
+        
     
+          
 
 
 
 
-    ##############################33
+
+
+    def isClave(self,texto):
+        for i in self.Claves:
+            if i==texto:
+                return True
+        return False
+            
+
+
+    def acciones(self):
+        textoim=''
+        textosalto=''
+        if self.Comandos is None:
+            self.TextConsola.insert(INSERT,'No hay comandos para ejecutar D:')
+        else:
+            for s in range(len(self.Comandos)):
+                if self.Comandos[s][0]=='imprimir':
+                    self.TextConsola.insert(END,self.Comandos[s][1])             
+                elif self.Comandos[s][0]=='imprimirln':
+                    self.TextConsola.insert(END,self.Comandos[s][1]+'\n')
+                elif self.Comandos[s][0]=='exportarReporte':
+                    self.tabla_registros(self.Comandos[s][1]) 
+                    self.TextConsola.insert(END,'\n>>> Tabla generada')
+                elif self.Comandos[s][0]=='conteo':
+                    self.TextConsola.insert(END,f'\n {len(self.Registros)}')
+                elif self.Comandos[s][0]=='datos':
+                    texto1=''
+                    for l in self.Claves:
+                        self.TextConsola.insert(END,f'    {l}')
+
+                    self.TextConsola.insert(END,'\n')
+                    for j in range(len(self.Registros)):
+                        for k in range(len(self.Registros[j])):
+                            self.TextConsola.insert(END,f'    {self.Registros[j][k]} |')
+                        self.TextConsola.insert(END,'\n')
+                    
+                elif self.Comandos[s][0]=='promedio':
+                    self.TextConsola.insert(END,'\n'+str(self.promedio(self.Comandos[s][1])))
+                elif self.Comandos[s][0]=='max':
+                    self.TextConsola.insert(END,'\n'+str(self.max(self.Comandos[s][1])))
+                elif self.Comandos[s][0]=='min':
+                    self.TextConsola.insert(END,'\n'+str(self.min(self.Comandos[s][1])))
+                elif self.Comandos[s][0]=='sumar':
+                    self.TextConsola.insert(END,'\n'+str(self.sumar(self.Comandos[s][1])))
+
+        self.TextConsola.configure(state='disabled')
+        self.TextConsola.see('end')
+        
+
+
+
+
+    def sumar(self,campo):
+        listaSuma=[]
+        for a in range(len(self.Claves)):
+            if self.Claves[a]==campo:
+                for j in range(len(self.Registros)):
+                    listaSuma.append(self.Registros[j][a])
+        suma=0
+        for k in listaSuma:
+            suma+=k
+
+        return suma
+
+    def min(self,campo):
+        listaMin=[]
+        for a in range(len(self.Claves)):
+            if self.Claves[a]==campo:
+                for j in range(len(self.Registros)):
+                    listaMin.append(self.Registros[j][a])
+        notamin=min(listaMin)
+        return notamin
+
+    def max(self,campo):
+        listaMax=[]
+        for a in range(len(self.Claves)):
+            if self.Claves[a]==campo:
+                for j in range(len(self.Registros)):
+                    listaMax.append(self.Registros[j][a])
+
+        notamax=max(listaMax)
+
+        return notamax
+
+
+    def promedio(self,campo):
+        suma=0
+        for a in range(len(self.Claves)):
+            if self.Claves[a]==campo:
+                for j in range(len(self.Registros)):
+                    suma=suma+self.Registros[j][a]
+        
+        pr=suma/len(self.Registros)
+        return pr
+
+    def v_datos(self):
+        texto=''
+        for l in self.Claves:
+            texto+=f"""    {l}   |   """
+        texto+='\n'
+        for j in range(len(self.Registros)):
+
+            for k in range(len(self.Registros[j])):
+                texto+=f"""    {self.Registros[j][k]}   |   """
+            texto+='\n'
+                
+        return texto
+
+
     def p_Registros(self):
         pass
     def A_prima(self):
         pass
 
-
-
-        #self.ListaTokens1.clear()
-        #self.ListaErrores1.clear()
 
 
 
@@ -895,7 +1287,100 @@ class Application():
             self.Generar_TablaTokens()
         elif self.combo.get()=='Generar Árbol de derivación':
             self.Generar_Arbol()
+    def tabla_registros(self,titulo):
+        Rhtml=open(f'Registros/index.html','w')
+        txRegistro=''
+        txRegistro+="""
+        <!DOCTYPE html> 
+        <html lang="en">
+        <head>
+	    <title>Registros | LFP</title>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--===============================================================================================-->	
+	    <link rel="icon" type="image/png" href="images/icons/bus.ico"/>
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+        <!--===============================================================================================-->
+	    <link rel="stylesheet" type="text/css" href="css/util.css">
+	    <link rel="stylesheet" type="text/css" href="css/main.css">
+        <!--===============================================================================================-->
+        </head>
+        <div class="header">"""
 
+        txRegistro+=f"""
+        <h1>{titulo}</h1>
+        """
+        txRegistro+="""
+        </div>
+        <body>
+	    <div class="limiter">
+		<div class="container-table100">
+		<div class="wrap-table100">
+		<div class="table100 ver2 m-b-110">
+		<div class="table100-head">
+		<table>
+		<thead>
+		<tr class="row100 head">
+        """
+        for i in range(len(self.Claves)):
+            txRegistro+=f"""<th class="cell100 column{i}">{self.Claves[i]}</th>"""
+        txRegistro+="""
+		</tr>
+		</thead>
+		</table>
+		</div>
+		<div class="table100-body js-pscroll">
+		<table>
+		<tbody>"""
+        for j in range(len(self.Registros)):
+            txRegistro+="""<tr class="row100 body">"""
+            for k in range(len(self.Registros[j])):
+                txRegistro+=f"""<td class="cell100 column{k}">{self.Registros[j][k]}</td>"""
+            txRegistro+="""</tr>"""
+
+        txRegistro+="""
+		</table>
+		</div>
+		</div>
+		</div>
+		</div>
+	    </div>
+        <!--===============================================================================================-->	
+	    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/bootstrap/js/popper.js"></script>
+	    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/select2/select2.min.js"></script>
+        <!--===============================================================================================-->
+	    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	    <script>
+		$('.js-pscroll').each(function(){
+		var ps = new PerfectScrollbar(this);
+		$(window).on('resize', function(){
+        ps.update();
+		})
+		});
+			
+		
+	    </script>
+        <!--===============================================================================================-->
+	    <script src="js/main.js"></script>
+        </body>
+        </html>
+        """
+        Rhtml.write(txRegistro)
+        Rhtml.close()
+       
 
     def Generar_TablaTokens(self):
         tokenshtml=open(f'Tabla de Tokens/index.html','w')
