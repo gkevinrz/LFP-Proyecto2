@@ -21,6 +21,8 @@ class Application():
         self.ListaTokens1=[]
         self.ListaErrores=[]
         self.ListaTokens=[]
+        self.ListaTokens_T=[]
+        self.ListaErrores_T=[]
         self.PalabrasReservadas=['Claves','Registros','imprimir','imprimirln','conteo','promedio','contarsi','datos','sumar','max','min','exportarReporte']
         self.PalabrasReservadasDatos=[]
 
@@ -63,7 +65,7 @@ class Application():
         self.TextoEntrada.place(x=40,y=150)
         #scrollh.config()
         self.TextoEntrada.yview('end')
-        ##
+        ##SCROLL DE CONSOLA
         self.TextConsola=Text (self.root, height=25, width=44, wrap='none')   
         scrollConsola=Scrollbar(self.root,command=self.TextConsola.yview)
         scrollh2=Scrollbar(self.root,command=self.TextConsola.xview,orient=HORIZONTAL)
@@ -71,6 +73,8 @@ class Application():
         self.TextConsola.configure(yscrollcommand=scrollConsola.set,xscrollcommand=scrollh2.set,background='#000000',font=('Segoe UI', 12,),foreground='white',insertbackground='white')
         self.TextConsola.place(x=900, y=150)
         self.TextConsola.yview('end')
+        
+
 
         scrollConsola.pack(expand=True,padx=10, fill=Y)
         scrollConsola.place(x=1290,y=150,height=540)
@@ -721,15 +725,27 @@ class Application():
         acept=Token(contador+1,'~',None,None,'Aceptacion')
         self.ListaTokens1.append(acept)
         self.ListaTokens=self.ListaTokens1.copy()
-        self.ListaErrores=self.ListaErrores1.copy() 
+        
+        #self.ListaErrores=self.ListaErrores1.copy()
+        ########
+        self.ListaTokens_T=self.ListaTokens1.copy()
+        #self.ListaErrores_T=self.ListaErrores1.copy()
+        self.ListaTokens1.clear()
+
         self.estado_inicial()
 
+     
 
 
 
      
     def estado_inicial(self):
+        self.TextConsola.config(state='normal')
+
+        #for l in self.ListaTokens:
+        #    print(l.lexema,l.token)
         self.p_CLaves1()
+        
     def p_CLaves1(self):
         if self.ListaTokens[0].token=='Palabra Reservada' and self.ListaTokens[0].lexema=='Claves':
             self.ListaTokens.pop(0)
@@ -922,8 +938,14 @@ class Application():
             self.ListaTokens.pop(0)
             self.ver_Reportes2()   
         elif self.ListaTokens[0].lexema=='~' and self.ListaTokens[0].token=='Aceptacion':
-            print(self.Comandos)
+            for l in self.ListaErrores1:
+                print(l.caracter,l.descripcion)
+            self.ListaErrores1.clear()
             self.acciones()
+
+            self.Claves.clear()
+            self.Comandos.clear()
+            self.Registros.clear()
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una instrucción',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error) 
@@ -1043,22 +1065,50 @@ class Application():
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+            
+        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='contarsi':
+            self.ListaTokens.pop(0)
+            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='contarsi' and self.isClave(self.ListaTokens[0].lexema):
+                self.campo=self.ListaTokens[0].lexema
+                self.ListaTokens.pop(0)
+                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='contarsi':
+                    self.ListaTokens.pop(0)
+                    if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==',' and self.instruccion=='contarsi':
+                        self.ListaTokens.pop(0)                        
+                        if self.ListaTokens[0].token=='Numero':
+                            self.valorcomparar=self.ListaTokens[0].lexema
+                            self.ListaTokens.pop(0)
+                            self.ver_Reportes3()
+                        elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='contarsi':
+                            self.ListaTokens.pop(0)
+                            if self.ListaTokens[0].token=='Cadena' and self.instruccion=='contarsi':
+                                self.valorcomparar=self.ListaTokens[0].lexema
+                                self.ListaTokens.pop(0)
+                                if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='contarsi':
+                                    self.ListaTokens.pop(0)
+                                    self.ver_Reportes3()
+                                else:
+                                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                                    self.ListaErrores1.append(error) 
+                            else:
+                                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba cadena',self.ListaTokens[0].lexema)
+                                self.ListaErrores1.append(error)
+                        else:
+                            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una cadena o numero',self.ListaTokens[0].lexema)
+                            self.ListaErrores1.append(error) 
+                    else:
+                        error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba ,',self.ListaTokens[0].lexema)
+                        self.ListaErrores1.append(error) 
+                else:
+                    error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
+                    self.ListaErrores1.append(error) 
+            else:
+                error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
+                self.ListaErrores1.append(error)
         
-
-
-
-
-
-
-
-
-
-
-
-
-
         else:
-            pass
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error)
     def ver_Reportes3(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')':
             self.ListaTokens.pop(0)
@@ -1146,23 +1196,25 @@ class Application():
             self.instruccion=''
             self.campo=''
             self.ver_Reportes()
+        elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='contarsi':
+            listatemporal3=[self.instruccion,self.campo,self.valorcomparar]
+            ls3=listatemporal3.copy()
+            self.Comandos.append(ls3)
+            listatemporal3.clear()
+            self.ListaTokens.pop(0)
+            self.instruccion=''
+            self.campo=''
+            self.valorcomparar=''
+            self.ver_Reportes()
 
-
-
-
-
-     
+        
         else:
-            pass
+            error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba ;',self.ListaTokens[0].lexema)
+            self.ListaErrores1.append(error) 
+            
         
     
-          
-
-
-
-
-
-
+        
     def isClave(self,texto):
         for i in self.Claves:
             if i==texto:
@@ -1172,6 +1224,7 @@ class Application():
 
 
     def acciones(self):
+        
         textoim=''
         textosalto=''
         if self.Comandos is None:
@@ -1206,11 +1259,64 @@ class Application():
                     self.TextConsola.insert(END,'\n'+str(self.min(self.Comandos[s][1])))
                 elif self.Comandos[s][0]=='sumar':
                     self.TextConsola.insert(END,'\n'+str(self.sumar(self.Comandos[s][1])))
+                elif self.Comandos[s][0]=='contarsi':
 
-        self.TextConsola.configure(state='disabled')
+                    print(self.Comandos)
+                    self.TextConsola.insert(END,'\n'+str(self.contarsi(self.Comandos[s][1],self.Comandos[s][2])))  
+
+        #self.TextConsola.configure(state='disabled')
+        
+        self.TextConsola.config(state='disabled')
         self.TextConsola.see('end')
         
 
+
+    def contarsi(self,campo,valorcomparar):
+        ent=None
+        flo=None
+        st=None
+        listaIguales=[]
+        try:
+            int(valorcomparar)
+            ent = True
+            flo=False
+            st=False
+        except ValueError:
+            try:
+                float(valorcomparar)
+                flo = True
+                ent=False
+                st=False
+            except ValueError:
+                st=True
+                flo=False
+                ent=False
+        
+        if ent:
+            for a in range(len(self.Claves)):
+                if self.Claves[a]==campo:
+                    for j in range(len(self.Registros)):
+                        if self.Registros[j][a]==int(valorcomparar):
+                            listaIguales.append(self.Registros[j][a])
+        elif flo:
+            for a in range(len(self.Claves)):
+                if self.Claves[a]==campo:
+                    for j in range(len(self.Registros)):
+                        if self.Registros[j][a]==float(valorcomparar):
+                            listaIguales.append(self.Registros[j][a])
+        elif st:
+            for a in range(len(self.Claves)):
+                if self.Claves[a]==campo:
+                    for j in range(len(self.Registros)):
+                        if self.Registros[j][a]==str(valorcomparar):
+                            listaIguales.append(self.Registros[j][a])
+
+        return len(listaIguales)
+
+
+
+
+      
 
 
 
@@ -1281,7 +1387,7 @@ class Application():
 
     def AccionComboBox(self,event):
         if self.combo.get()=='Generar Reporte de Errores':
-            #print('ERRORRRRRR')
+            print(self.ListaErrores)
             self.Generar_TablaErrores()
         elif self.combo.get()=='Generar Reporte de Tokens':
             self.Generar_TablaTokens()
@@ -1433,7 +1539,7 @@ class Application():
 		<div class="table100-body js-pscroll">
 		<table>
 		<tbody>"""
-        for ob in self.ListaTokens:
+        for ob in self.ListaTokens_T:
             if ob.lexema=='~' and ob.token=='Aceptacion':
                 pass
             else:
@@ -1477,6 +1583,7 @@ class Application():
         """
         tokenshtml.write(txtokens)
         tokenshtml.close()
+        
         #for x in self.ListaTokens:
         #    print(x.Numero,x.lexema,x.fila,x.columna,x.token)
         #
@@ -1532,7 +1639,7 @@ class Application():
 		<div class="table100-body js-pscroll">
         <table>
 		<tbody>"""
-        for a in self.ListaErrores:
+        for a in self.ListaErrores1:
             txtError+=f"""<tr class="row100 body">
 			<td class="cell100 column1">{a.tipoError}</td>
 			<td class="cell100 column2">{a.caracter}</td>
@@ -1572,12 +1679,8 @@ class Application():
         """
         erroreshtml.write(txtError)
         erroreshtml.close()
-        #for y in self.ListaErrores:
-        #    print(y.tipoError,y.filaError,y.columnaError,y.descripcion,y.caracter)
+    
 
-
-    def Generar_Arbol(self):
-        pass
 
 
 
