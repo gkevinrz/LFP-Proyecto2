@@ -753,6 +753,9 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Claves',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.p_Claves2()
+
     def p_Claves2(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='=':
             self.ListaTokens.pop(0)
@@ -760,6 +763,9 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba =',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.p_Claves3()
+
     def p_Claves3(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='[':
             self.ListaTokens.pop(0)
@@ -767,6 +773,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba [',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_ListaClaves()
 
     def ver_ListaClaves(self):
         self.ver_elemento()
@@ -783,12 +791,20 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error)
+                    self.ListaTokens.pop(0)
+                    self.ver_ListaClaves_p()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_ListaClaves_p()
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_ListaClaves_p()
+            
+
 
 
     def ver_ListaClaves_p(self):
@@ -801,6 +817,9 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o ]',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Registros()
+
 
             ##########################################
 
@@ -811,6 +830,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Registros',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Registros2()
 
     def ver_Registros2(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='=':
@@ -819,6 +840,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba =',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Registros3()
 
     def ver_Registros3(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema=='[':
@@ -827,6 +850,11 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba [',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_ListaRegistros()
+
+
+
     def ver_ListaRegistros(self):
         self.ver_Registro()
 
@@ -837,6 +865,12 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba {',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.Ver_ListaElementoRegistro()
+
+
+
+
     def Ver_ListaElementoRegistro(self):
         self.Ver_ElementoRegistro()
     
@@ -852,21 +886,30 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error)
+                    self.ListaTokens.pop(0)
+                    self.ver_ListaElementoRegistro_p()
+
 
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_ListaElementoRegistro_p()
         else:
             if self.ListaTokens[0].token=='Numero':
                 if self.ListaTokens[0].lexema.isdigit():
                     self.Registros1.append(int(self.ListaTokens[0].lexema))
                 else:
                     self.Registros1.append(float(self.ListaTokens[0].lexema))
+
                 self.ListaTokens.pop(0)    
                 self.ver_ListaElementoRegistro_p()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba numero o Comillas Dobles',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_ListaElementoRegistro_p()
+
        
 
 
@@ -883,6 +926,9 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba , o }',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.Ver_ListaRegistro_P()
+
     def Ver_ListaRegistro_P(self):
         if self.ListaTokens[0].lexema=='{' and self.ListaTokens[0].token=='Simbolo':
             self.ListaTokens.pop(0)
@@ -894,6 +940,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba { o ]',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error) 
+            self.ListaTokens.pop(0)
+            self.ver_Reportes()
     ############################################
     def ver_Reportes(self):
         #print(self.ListaTokens[-1].lexema, self.ListaTokens[-1].token)
@@ -940,6 +988,8 @@ class Application():
         elif self.ListaTokens[0].lexema=='~' and self.ListaTokens[0].token=='Aceptacion':
             for l in self.ListaErrores1:
                 print(l.caracter,l.descripcion)
+            #self.ListaErrores1.clear()
+            self.ListaErrores=self.ListaErrores1.copy()
             self.ListaErrores1.clear()
             self.acciones()
 
@@ -948,7 +998,9 @@ class Application():
             self.Registros.clear()
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una instrucción',self.ListaTokens[0].lexema)
-            self.ListaErrores1.append(error) 
+            self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Reportes2() 
 
     def ver_Reportes2(self):
         print(self.instruccion)
@@ -958,6 +1010,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba (',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error) 
+            self.ListaTokens.pop(0)
+            self.verCampo()
         
     def verCampo(self):
         if self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimir':
@@ -970,10 +1024,15 @@ class Application():
                     self.ver_Reportes3()
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
-                    self.ListaErrores1.append(error) 
+                    self.ListaErrores1.append(error)
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
+
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una Cadena',self.ListaTokens[0].lexema)
-                self.ListaErrores1.append(error) 
+                self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
 
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='imprimirln':
             self.ListaTokens.pop(0)
@@ -986,9 +1045,16 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
+
+
+
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='exportarReporte':
             self.ListaTokens.pop(0)
             if self.ListaTokens[0].token=='Cadena' and self.instruccion=='exportarReporte':
@@ -1000,9 +1066,16 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
+
+
+
         elif self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')' and self.instruccion=='conteo':
             self.ListaTokens.pop(0)
             self.ver_Reportes4()
@@ -1020,9 +1093,16 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
+
+
+
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='max':
             self.ListaTokens.pop(0)
             if self.ListaTokens[0].token=='Cadena' and self.instruccion=='max' and self.isClave(self.ListaTokens[0].lexema):
@@ -1034,9 +1114,15 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
+
+
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='min':
             self.ListaTokens.pop(0)
             if self.ListaTokens[0].token=='Cadena' and self.instruccion=='min' and self.isClave(self.ListaTokens[0].lexema):
@@ -1048,9 +1134,16 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
+
+
+
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='sumar':
             self.ListaTokens.pop(0)
             if self.ListaTokens[0].token=='Cadena' and self.instruccion=='sumar' and self.isClave(self.ListaTokens[0].lexema):
@@ -1062,9 +1155,13 @@ class Application():
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
             
         elif self.ListaTokens[0].token=='Comillas Dobles' and self.ListaTokens[0].lexema=='"' and self.instruccion=='contarsi':
             self.ListaTokens.pop(0)
@@ -1090,32 +1187,49 @@ class Application():
                                 else:
                                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                                     self.ListaErrores1.append(error) 
+                                    self.ListaTokens.pop(0)
+                                    self.ver_Reportes3()
                             else:
                                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba cadena',self.ListaTokens[0].lexema)
                                 self.ListaErrores1.append(error)
+                                self.ListaTokens.pop(0)
+                                self.ver_Reportes3()
                         else:
                             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba una cadena o numero',self.ListaTokens[0].lexema)
                             self.ListaErrores1.append(error) 
+                            self.ListaTokens.pop(0)
+                            self.ver_Reportes3()
                     else:
                         error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba ,',self.ListaTokens[0].lexema)
                         self.ListaErrores1.append(error) 
+                        self.ListaTokens.pop(0)
+                        self.ver_Reportes3()
                 else:
                     error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba "',self.ListaTokens[0].lexema)
                     self.ListaErrores1.append(error) 
+                    self.ListaTokens.pop(0)
+                    self.ver_Reportes3()
             else:
                 error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena y Campo Válido',self.ListaTokens[0].lexema)
                 self.ListaErrores1.append(error)
+                self.ListaTokens.pop(0)
+                self.ver_Reportes3()
         
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba Cadena',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Reportes3()
     def ver_Reportes3(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==')':
             self.ListaTokens.pop(0)
             self.ver_Reportes4()
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba )',self.ListaTokens[0].lexema)
-            self.ListaErrores1.append(error) 
+            self.ListaErrores1.append(error)
+            self.ListaTokens.pop(0)
+            self.ver_Reportes4()
+
     def ver_Reportes4(self):
         if self.ListaTokens[0].token=='Simbolo' and self.ListaTokens[0].lexema==';' and self.instruccion=='imprimir':
             listatemporal=[self.instruccion,self.cadenaimprimir]
@@ -1211,6 +1325,8 @@ class Application():
         else:
             error=Error('Sintactico',self.ListaTokens[0].fila,self.ListaTokens[0].columna,'Se esperaba ;',self.ListaTokens[0].lexema)
             self.ListaErrores1.append(error) 
+            self.ver_Reportes()
+
             
         
     
@@ -1639,7 +1755,7 @@ class Application():
 		<div class="table100-body js-pscroll">
         <table>
 		<tbody>"""
-        for a in self.ListaErrores1:
+        for a in self.ListaErrores:
             txtError+=f"""<tr class="row100 body">
 			<td class="cell100 column1">{a.tipoError}</td>
 			<td class="cell100 column2">{a.caracter}</td>
