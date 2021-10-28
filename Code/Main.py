@@ -1353,9 +1353,9 @@ class Application():
                     self.TextConsola.insert(END,self.Comandos[s][1]+'\n')
                 elif self.Comandos[s][0]=='exportarReporte':
                     self.tabla_registros(self.Comandos[s][1]) 
-                    self.TextConsola.insert(END,'\n>>> Tabla generada')
+                    self.TextConsola.insert(END,'> Tabla generada')
                 elif self.Comandos[s][0]=='conteo':
-                    self.TextConsola.insert(END,f'\n {len(self.Registros)}')
+                    self.TextConsola.insert(END,f'> {len(self.Registros)}')
                 elif self.Comandos[s][0]=='datos':
                     texto1=''
                     for l in self.Claves:
@@ -1368,17 +1368,17 @@ class Application():
                         self.TextConsola.insert(END,'\n')
                     
                 elif self.Comandos[s][0]=='promedio':
-                    self.TextConsola.insert(END,'\n'+str(self.promedio(self.Comandos[s][1])))
+                    self.TextConsola.insert(END,'> '+str(self.promedio(self.Comandos[s][1])))
                 elif self.Comandos[s][0]=='max':
-                    self.TextConsola.insert(END,'\n'+str(self.max(self.Comandos[s][1])))
+                    self.TextConsola.insert(END,'> '+str(self.max(self.Comandos[s][1])))
                 elif self.Comandos[s][0]=='min':
-                    self.TextConsola.insert(END,'\n'+str(self.min(self.Comandos[s][1])))
+                    self.TextConsola.insert(END,'> '+str(self.min(self.Comandos[s][1])))
                 elif self.Comandos[s][0]=='sumar':
-                    self.TextConsola.insert(END,'\n'+str(self.sumar(self.Comandos[s][1])))
+                    self.TextConsola.insert(END,'> '+str(self.sumar(self.Comandos[s][1])))
                 elif self.Comandos[s][0]=='contarsi':
 
                     print(self.Comandos)
-                    self.TextConsola.insert(END,'\n'+str(self.contarsi(self.Comandos[s][1],self.Comandos[s][2])))  
+                    self.TextConsola.insert(END,'> '+str(self.contarsi(self.Comandos[s][1],self.Comandos[s][2])))  
 
         #self.TextConsola.configure(state='disabled')
         
